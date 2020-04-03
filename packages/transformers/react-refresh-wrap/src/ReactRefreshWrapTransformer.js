@@ -1,10 +1,10 @@
 // @flow
 
-import path from 'path';
+// import path from 'path';
 import {Transformer} from '@parcel/plugin';
-import {relativePath} from '@parcel/utils';
+// import {relativePath} from '@parcel/utils';
 
-const WRAPPER = path.join(__dirname, 'helpers', 'helpers.js');
+// const WRAPPER = path.join(__dirname, 'helpers', 'helpers.js');
 
 function shouldExclude(asset, options) {
   return (
@@ -24,10 +24,12 @@ export default (new Transformer({
       return [asset];
     }
 
-    let wrapperPath = relativePath(path.dirname(asset.filePath), WRAPPER);
-    if (!wrapperPath.startsWith('.')) {
-      wrapperPath = './' + wrapperPath;
-    }
+    // let wrapperPath = relativePath(path.dirname(asset.filePath), WRAPPER);
+    // if (!wrapperPath.startsWith('.')) {
+    //   wrapperPath = './' + wrapperPath;
+    // }
+    let wrapperPath =
+      '@parcel/transformer-react-refresh-wrap/src/helpers/helpers.js';
 
     let code = await asset.getCode();
     let map = await asset.getMap();

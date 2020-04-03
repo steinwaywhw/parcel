@@ -1,4 +1,5 @@
 // @flow
+/* global MessageChannel:readonly */
 
 import type {FileSystem, FileOptions, ReaddirOptions, Encoding} from './types';
 import type {FilePath} from '@parcel/types';
@@ -16,6 +17,21 @@ import WorkerFarm, {Handle} from '@parcel/workers';
 import nullthrows from 'nullthrows';
 import EventEmitter from 'events';
 import {findAncestorFile, findNodeModule, findFirstFile} from './find';
+
+let SharedBuffer: Class<ArrayBuffer> | Class<SharedArrayBuffer> = ArrayBuffer;
+// Safari has removed the constructor
+if (typeof SharedArrayBuffer !== 'undefined') {
+  let channel = new MessageChannel();
+  try {
+    // Firefox might throw when sending the Buffer over a MessagePort
+    channel.port1.postMessage(new SharedArrayBuffer(0));
+    SharedBuffer = SharedArrayBuffer;
+  } catch (_) {
+    // NOOP
+  }
+  channel.port1.close();
+  channel.port2.close();
+}
 
 const instances: Map<number, MemoryFS> = new Map();
 let id = 0;
@@ -661,7 +677,7 @@ class Watcher {
   }
 }
 
-class FSError extends Error {
+export class FSError extends Error {
   code: string;
   path: FilePath;
   constructor(code: string, path: FilePath, message: string) {
@@ -878,7 +894,7 @@ class Dirent {
   }
 }
 
-class File extends Entry {
+export class File extends Entry {
   buffer: Buffer;
   constructor(buffer: Buffer, mode: number) {
     super(S_IFREG | mode);
@@ -906,16 +922,13 @@ class Directory extends Entry {
   }
 }
 
-function makeShared(contents: Buffer | string): Buffer {
-  if (
-    typeof contents !== 'string' &&
-    contents.buffer instanceof SharedArrayBuffer
-  ) {
+export function makeShared(contents: Buffer | string): Buffer {
+  if (typeof contents !== 'string' && contents.buffer instanceof SharedBuffer) {
     return contents;
   }
 
   let length = Buffer.byteLength(contents);
-  let shared = new SharedArrayBuffer(length);
+  let shared = new SharedBuffer(length);
   let buffer = Buffer.from(shared);
   if (typeof contents === 'string') {
     buffer.write(contents);

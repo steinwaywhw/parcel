@@ -7,6 +7,7 @@ import path from 'path';
 import {hashString} from '@parcel/hash';
 import {NodeFS} from '@parcel/fs';
 import {LMDBCache, FSCache} from '@parcel/cache';
+import nullthrows from 'nullthrows';
 import {NodePackageManager} from '@parcel/package-manager';
 import {getRootDir, resolveConfig} from '@parcel/utils';
 import loadDotEnv from './loadDotEnv';
@@ -25,8 +26,8 @@ function generateInstanceId(entries: Array<FilePath>): string {
 export default async function resolveOptions(
   initialOptions: InitialParcelOptions,
 ): Promise<ParcelOptions> {
-  let inputFS = initialOptions.inputFS || new NodeFS();
-  let outputFS = initialOptions.outputFS || new NodeFS();
+  let inputFS = nullthrows(initialOptions.inputFS); /* || new NodeFS() */
+  let outputFS = nullthrows(initialOptions.outputFS); /* || new NodeFS() */
 
   let inputCwd = inputFS.cwd();
   let outputCwd = outputFS.cwd();

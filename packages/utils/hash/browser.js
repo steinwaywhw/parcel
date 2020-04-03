@@ -2,7 +2,7 @@
 const xxhash = require('xxhash-wasm');
 
 let h64, h64Raw;
-module.exports.init = (xxhash().then(xxh => {
+module.exports.init = (xxhash.default().then(xxh => {
   ({h64, h64Raw} = xxh);
 }) /*: Promise<void> */);
 

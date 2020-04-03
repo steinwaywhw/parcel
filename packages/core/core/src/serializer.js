@@ -1,11 +1,7 @@
 // @flow
-import v8 from 'v8';
 import {createBuildCache} from './buildCache';
-
-// $FlowFixMe - Flow doesn't know about this method yet
-export let serializeRaw = v8.serialize;
-// $FlowFixMe - Flow doesn't know about this method yet
-export let deserializeRaw = v8.deserialize;
+import * as msgpack from '@msgpack/msgpack';
+import {Buffer} from 'buffer';
 
 const nameToCtor: Map<string, Class<*>> = new Map();
 const ctorToName: Map<Class<*>, string> = new Map();
@@ -59,7 +55,8 @@ function shallowCopy(object: any) {
 function isBuffer(object) {
   return (
     object.buffer instanceof ArrayBuffer ||
-    object.buffer instanceof SharedArrayBuffer
+    (typeof SharedArrayBuffer !== 'undefined' &&
+      object.buffer instanceof SharedArrayBuffer)
   );
 }
 
@@ -258,4 +255,48 @@ export function deserializeToCache(buffer: Buffer): any {
 
 export function removeSerializedObjectFromCache(object: any) {
   serializeCache.delete(object);
+}
+
+export let serializeRaw: any => Buffer = v =>
+  Buffer.from(msgpack.encode(v, {extensionCodec}));
+export let deserializeRaw: Buffer => any = v =>
+  msgpack.decode(v, {extensionCodec});
+
+// Derived from
+// https://github.com/msgpack/msgpack-javascript#extension-types
+const extensionCodec = new msgpack.ExtensionCodec();
+extensionCodec.register({
+  type: 0,
+  decode(value) {
+    return new Set(msgpack.decode(value, {extensionCodec}));
+  },
+  encode(value) {
+    return value instanceof Set
+      ? msgpack.encode([...value], {extensionCodec})
+      : null;
+  },
+});
+extensionCodec.register({
+  type: 1,
+  decode(value) {
+    return new Map(msgpack.decode(value, {extensionCodec}));
+  },
+  encode(value) {
+    return value instanceof Map
+      ? msgpack.encode([...value], {extensionCodec})
+      : null;
+  },
+});
+
+// $FlowFixMe
+if (!process.browser) {
+  try {
+    const v8 = require('v8');
+    // $FlowFixMe - flow doesn't know about this method yet
+    serializeRaw = v8.serialize;
+    // $FlowFixMe - flow doesn't know about this method yet
+    deserializeRaw = v8.deserialize;
+  } catch (_) {
+    // NOOP
+  }
 }

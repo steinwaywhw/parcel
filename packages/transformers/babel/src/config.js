@@ -100,6 +100,7 @@ export async function load(
 
   let partialConfig: ?{|
     [string]: any,
+    // $FlowFixMe
   |} = await babelCore.loadPartialConfigAsync(babelOptions);
 
   let addIncludedFile = file => {
@@ -261,15 +262,17 @@ function definePluginDependencies(config, babelConfig: ?BabelConfig, options) {
     ...(babelConfig.plugins || []),
   ];
   for (let configItem of configItems) {
-    // FIXME: this uses a relative path from the project root rather than resolving
-    // from the config location because configItem.file.request can be a shorthand
-    // rather than a full package name.
-    config.addDevDependency({
-      specifier: relativePath(options.projectRoot, configItem.file.resolved),
-      resolveFrom: path.join(options.projectRoot, 'index'),
-      // Also invalidate @parcel/transformer-babel when the plugin or a dependency updates.
-      // This ensures that the caches in @babel/core are also invalidated.
-      invalidateParcelPlugin: true,
-    });
+    if (configItem.file) {
+      // FIXME: this uses a relative path from the project root rather than resolving
+      // from the config location because configItem.file.request can be a shorthand
+      // rather than a full package name.
+      config.addDevDependency({
+        specifier: relativePath(options.projectRoot, configItem.file.resolved),
+        resolveFrom: path.join(options.projectRoot, 'index'),
+        // Also invalidate @parcel/transformer-babel when the plugin or a dependency updates.
+        // This ensures that the caches in @babel/core are also invalidated.
+        invalidateParcelPlugin: true,
+      });
+    }
   }
 }
