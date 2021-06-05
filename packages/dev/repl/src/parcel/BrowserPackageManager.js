@@ -6,6 +6,9 @@ import type {
   Invalidations,
   ResolveResult,
 } from '@parcel/package-manager';
+import {registerSerializableClass} from '@parcel/core';
+// $FlowFixMe[untyped-import]
+import packageJson from '../../package.json';
 
 import path from 'path';
 // eslint-disable-next-line monorepo/no-internal-import
@@ -67,10 +70,30 @@ export const BUILTINS = {
 
 export class BrowserPackageManager implements PackageManager {
   resolver: NodeResolver;
+  fs: FileSystem;
+  projectRoot: FilePath;
   cache: Map<DependencySpecifier, ResolveResult> = new Map();
 
   constructor(fs: FileSystem, projectRoot: FilePath) {
+    this.fs = fs;
+    this.projectRoot = projectRoot;
     this.resolver = new NodeResolver(fs, projectRoot);
+  }
+
+  static deserialize(opts: any): BrowserPackageManager {
+    return new BrowserPackageManager(opts.fs, opts.projectRoot);
+  }
+
+  serialize(): {|
+    $$raw: boolean,
+    fs: FileSystem,
+    projectRoot: FilePath,
+  |} {
+    return {
+      $$raw: false,
+      fs: this.fs,
+      projectRoot: this.projectRoot,
+    };
   }
 
   async require(
@@ -133,3 +156,8 @@ export class BrowserPackageManager implements PackageManager {
   }
   invalidate(): void {}
 }
+
+registerSerializableClass(
+  `${packageJson.version}:BrowserPackageManager`,
+  BrowserPackageManager,
+);

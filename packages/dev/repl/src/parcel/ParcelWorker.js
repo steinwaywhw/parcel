@@ -13,6 +13,7 @@ import {makeDeferredWithPromise} from '@parcel/utils';
 // import {NodePackageManager} from '@parcel/package-manager';
 import configRepl from '@parcel/config-repl';
 import {generatePackageJson, nthIndex} from '../utils/';
+import {IDBCache} from './IDBCache';
 import path from 'path';
 import {yarnInstall} from './yarn.js';
 import {BrowserPackageManager} from './BrowserPackageManager.js';
@@ -186,6 +187,7 @@ async function setup(assets, options) {
     defaultConfig: '/.parcelrc',
     inputFS: fs,
     outputFS: fs,
+    cache: new IDBCache(),
     defaultTargetOptions: {
       distDir: PathUtils.DIST_DIR,
       publicUrl: options.publicUrl || undefined,
