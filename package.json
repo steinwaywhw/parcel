@@ -77,5 +77,8 @@
     "react-dom": "preact/compat",
     "react": "preact/compat",
     "scheduler": false
+  },
+  "resolutions": {
+    "buffer": "mischnic/buffer#b8a4fa94"
   }
 }
