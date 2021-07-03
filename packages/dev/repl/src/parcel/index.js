@@ -5,7 +5,11 @@ import type {BundleOutput} from './ParcelWorker';
 import {proxy, wrap, transfer} from 'comlink';
 
 const worker = wrap(
-  new Worker('./ParcelWorker.js', {name: 'Parcel Worker Main'}),
+  // $FlowFixMe
+  new Worker(new URL('./ParcelWorker.js', import /*:: ("") */.meta.url), {
+    name: 'Parcel Worker Main',
+    type: 'module',
+  }),
 );
 
 // const worker = {

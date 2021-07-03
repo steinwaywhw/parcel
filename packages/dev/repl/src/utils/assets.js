@@ -196,7 +196,7 @@ export const ASSET_PRESETS: Map<
 </head>
 <body>
   <a href="./other.html">Link</a>
-  <script src="./index.js"></script>
+  <script src="./index.js" type="module"></script>
 </body>`,
                 isEntry: true,
               },
@@ -420,7 +420,7 @@ module.hot?.accept();`,
                 isEntry: true,
                 value: `<!DOCTYPE html>
 <main></main>
-<script src="./index.jsx"></script>`,
+<script src="./index.jsx" type="module"></script>`,
               },
             ],
             [
@@ -465,9 +465,9 @@ export function App() {
                   app: {},
                 },
                 dependencies: {
-                  react: 'latest',
-                  'react-dom': 'latest',
-                  'react-refresh': 'latest',
+                  react: '*',
+                  'react-dom': '*',
+                  'react-refresh': '*',
                 },
               },
               null,
@@ -493,7 +493,7 @@ export function App() {
                 isEntry: true,
                 value: `<!DOCTYPE html>
 <main></main>
-<script src="./index.jsx"></script>`,
+<script src="./index.jsx" type="module"></script>`,
               },
             ],
             [
@@ -570,10 +570,10 @@ export function App() {
                   app: {},
                 },
                 dependencies: {
-                  '@adobe/react-spectrum': 'latest',
-                  react: 'latest',
-                  'react-dom': 'latest',
-                  'react-refresh': 'latest',
+                  '@adobe/react-spectrum': '*',
+                  react: '*',
+                  'react-dom': '*',
+                  'react-refresh': '*',
                 },
               },
               null,

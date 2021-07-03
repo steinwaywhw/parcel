@@ -31,7 +31,13 @@ export default class WebWorker implements WorkerImpl {
   }
 
   start(): Promise<void> {
-    this.worker = new Worker('./WebChild.js', {name: `Parcel Worker ${id++}`});
+    this.worker = new Worker( // $FlowFixMe
+      new URL('./WebChild.js', import /*:: ("") */.meta.url),
+      {
+        name: `Parcel Worker ${id++}`,
+        type: 'module',
+      },
+    );
 
     // $FlowFixMe ???
     this.worker.onmessage = ({data}) => this.handleMessage(data);

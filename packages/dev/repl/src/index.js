@@ -380,8 +380,11 @@ function App() {
 render(<App />, document.getElementById('root'));
 
 if (navigator.serviceWorker) {
-  navigator.serviceWorker.register('./sw.js').catch(error => {
-    // eslint-disable-next-line no-console
-    console.error('Service worker registration failed:', error);
-  });
+  navigator.serviceWorker
+    // $FlowFixMe
+    .register(new URL('./sw.js', import /*:: ("") */.meta.url))
+    .catch(error => {
+      // eslint-disable-next-line no-console
+      console.error('Service worker registration failed:', error);
+    });
 }
