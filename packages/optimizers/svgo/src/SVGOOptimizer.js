@@ -20,6 +20,8 @@ export default (new Optimizer({
         config.invalidateOnStartup();
       }
       return configFile.contents;
+    } else {
+      return {}
     }
   },
 
